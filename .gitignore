@@ -1,0 +1,21 @@
+# Mac stuff
+.DS_Store
+
+# ViM stuff
+*.swp
+
+# Ignore Cloud9 settings in C9 dir
+/.settings
+/.c9revisions
+
+# SETUP OUTPUTS
+/cloud9/
+/nodeenv/
+/node-webkit/
+/c9.sh
+
+# SETUP OUTPUTS - Darwin / Mac
+/C9.app
+/credits.html
+/nwsnapshot
+

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<settings time="1381674957257">
+  <general animateui="true" revealfile="false" confirmexit="false">
+    <keybindings preset="auto"/>
+  </general>
+  <auto>
+    <menus minimized="false"/>
+    <files/>
+    <tabs show="true"/>
+    <panels active="ext/tree/tree">
+      <panel path="ext/settings/settings" width="250"/>
+      <panel path="ext/openfiles/openfiles" width="130"/>
+      <panel path="ext/tree/tree" width="200"/>
+    </panels>
+    <tree_selection path="/workspace" type="folder"/>
+    <projecttree>["/workspace"]</projecttree>
+  </auto>
+  <breakpoints/>
+  <beautify>
+    <jsbeautify preserveempty="true" keeparrayindentation="false" jslinthappy="false" braces="end-expand" space_before_conditional="true" unescape_strings="true"/>
+  </beautify>
+  <editors>
+    <code stripws="false"/>
+  </editors>
+</settings>

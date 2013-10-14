@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=GNOME;GTK;Development;IDE;
+Comment=A Mac OS X wrapper for running the Cloud9 IDE locally
+Encoding=UTF-8
+Exec=../linux/c9.sh
+Icon=../www/img/c9.png
+Keywords=IDE;development;programming;
+Name=C9
+Terminal=false
+Type=Application

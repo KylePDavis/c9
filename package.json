@@ -12,7 +12,7 @@
 		"min_height": 500,
 		"min_width": 500,
 		"show": true,
-		"toolbar": true,
+		"toolbar": false,
 		"frame": true
 	}
 }

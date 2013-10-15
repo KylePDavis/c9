@@ -1,9 +1,28 @@
-#!/bin/sh
-set -e
-set -x
+#!/bin/bash
+# Setup script for the c9 app
+###############################################################################
+
+
+# Shell options
+set -o pipefail  # Capture fail exit codes in piped commands
+
+
+# Get command info
+CMD_PWD=$(pwd)
+CMD="$0"
+CMD_DIR="$(cd "$(dirname "$CMD")" && pwd)"
+
+
+# help
+[ "$#" -gt 0 ] && awk 'NR>1,/^(###|$)/{print $0; exit}' "$CMD" && exit 1
+
+
+# Intro
+cd "$CMD_DIR"
 echo
 
 
+# OS
 echo "Checking OS ..."
 SYS_NAME=$(uname -s)
 case "$SYS_NAME" in
@@ -20,7 +39,7 @@ case "$SYS_NAME" in
 esac
 
 
-
+# nodeenv
 echo "Checking node environment ..."
 if [ -d nodeenv ]; then
 	echo "  * Found ./nodeenv/"
@@ -44,6 +63,7 @@ fi
 echo
 
 
+# cloud9
 echo "Checking cloud9 server ..."
 if [ -d cloud9 ]; then
 	echo "  * Found ./cloud9/"
@@ -66,6 +86,7 @@ fi
 echo
 
 
+# node-webkit
 echo "Checking node-webkit client ..."
 if [ -d node-webkit ]; then
 	echo "  * Found ./node-webkit/"
@@ -108,6 +129,7 @@ fi
 echo
 
 
+# Outro
 echo "Now you can run:"
 case "$SYS_NAME" in
  Linux)

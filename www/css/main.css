@@ -164,7 +164,7 @@ body.ready > #logs {
 	width: auto;
 	margin-left: -9px;
 	margin-right: -9px;
-	min-width: 17px;
+	min-width: 150px;
 	max-width: 150px;
 	-webkit-box-flex: 1;
 	line-height: 20px;

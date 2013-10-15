@@ -64,8 +64,10 @@ body.ready #welcome #intro {
 	font-size: 1.2em;
 }
 
-//#welcome #workspaces {
-//}
+/*
+#welcome #workspaces {
+}
+*/
 body.notready #welcome #workspaces {
 	opacity: 0;
 }

@@ -59,7 +59,7 @@ var Servers = module.exports = {
 			readline = require("readline"),
 			nodeEnvDir = process.cwd() + "/nodeenv",
 			nodeBin = nodeEnvDir + "/bin/node",
-			nodeArgs = ["cloud9/server.js", "local", "-w", dir];
+			nodeArgs = [process.cwd() + "/cloud9/server.js", process.cwd() + "/serverConfig", "-w", dir];
 		if (!ip) ip = Config.current.ip;
 		Log.out("Starting new C9 server process: ", {bin:nodeBin, args:nodeArgs, env:process.env});
 		process.env.IP = ip;

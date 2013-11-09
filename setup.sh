@@ -27,13 +27,13 @@ echo "Checking OS ..."
 SYS_NAME=$(uname -s)
 case "$SYS_NAME" in
  Linux)
-	echo "Detected Linux."
+	echo "  * Found Linux."
 	;;
  Darwin)
-	echo "Detected Darwin."
+	echo "  * Found Darwin."
 	;;
 *)
-	echo "Unknown system type $SYS_NAME. Exiting!"
+	echo "ERROR: Unknown system type $SYS_NAME. Exiting!"
 	exit 3;
 	;;
 esac
@@ -120,7 +120,7 @@ else
 		;;
 
 	*)
-		echo "Unknown system type $SYS_NAME. Exiting!"
+		echo "ERROR: Unknown system type $SYS_NAME. Exiting!"
 		exit 3;
 		;;
 

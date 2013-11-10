@@ -96,11 +96,11 @@ else
 
 	 Linux)
 		if [ $(uname -i) = "x86_64" ]; then
-			curl https://s3.amazonaws.com/node-webkit/v0.7.5/node-webkit-v0.7.5-linux-x64.tar.gz | tar -xzf-
-			mv node-webkit-v0.7.5-linux-x64 node-webkit
+			curl https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-linux-x64.tar.gz | tar -xzf-
+			mv node-webkit-v0.8.0-linux-x64 node-webkit
 		else
-			curl https://s3.amazonaws.com/node-webkit/v0.7.5/node-webkit-v0.7.5-linux-ia32.tar.gz | tar -xzf-
-			mv node-webkit-v0.7.5-linux-ia32 node-webkit
+			curl https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-linux-ia32.tar.gz | tar -xzf-
+			mv node-webkit-v0.8.0-linux-ia32 node-webkit
 		fi
 
 		if ldd node-webkit/nw | grep -q 'libudev.so.0 => not found'; then
@@ -111,9 +111,9 @@ else
 
 	 Darwin)
 		#TODO: unzip from piped stdin instead?
-		curl -O https://s3.amazonaws.com/node-webkit/v0.7.5/node-webkit-v0.7.5-osx-ia32.zip
-		unzip node-webkit-v0.7.5-osx-ia32.zip
-		rm node-webkit-v0.7.5-osx-ia32.zip
+		curl -O https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-osx-ia32.zip
+		unzip node-webkit-v0.8.0-osx-ia32.zip
+		rm node-webkit-v0.8.0-osx-ia32.zip
 		mv node-webkit.app C9.app
 		cp darwin/Info.plist C9.app/Contents/Info.plist 
 		cp darwin/nw.icns C9.app/Contents/Resources/nw.icns 

@@ -41,8 +41,10 @@ esac
 
 # nodeenv
 echo "Checking node environment ..."
-if [ -d nodeenv ]; then
-	echo "  * Found ./nodeenv/"
+NODEENV_VER="0.6.21"
+NODEENV_DIR="nodeenv"
+if [ -d "$NODEENV_DIR" -a -x "$NODEENV_DIR/bin/activate" -a -x "$NODEENV_DIR/bin/node" ] && "$NODEENV_DIR/bin/node" --version | grep -q "^v$NODEENV_VER"; then
+	echo "  * Found \"./$NODEENV_DIR/\""
 else
 	if ! which easy_install >/dev/null; then
 		echo "  * Installing easy_install ..."
@@ -55,18 +57,20 @@ else
 		sudo easy_install nodeenv
 	fi
 
-	echo "  * Building node env in ./nodeenv/ ..."
+	echo "  * Building node env in \"./$NODEENV_DIR/\" ..."
 	# build node env for your computer
-	nodeenv --node=0.6.21 --jobs=4 --clean-src ./nodeenv/
-	#TODO: still randomly breaking on requests?   nodeenv --node=0.8.25 --jobs=4 --clean-src ./nodeenv/
+	nodeenv --node="$NODEENV_VER" --jobs=4 --clean-src "./$NODEENV_DIR/"
+	#TODO: still randomly breaking on requests?   nodeenv --node=0.8.25 --jobs=4 --clean-src "./$NODEENV_DIR/"
 fi
 echo
 
 
 # cloud9
+CLOUD9_VER="master"
+CLOUD9_DIR="cloud9"
 echo "Checking cloud9 server ..."
-if [ -d cloud9 ]; then
-	echo "  * Found ./cloud9/"
+if [ -d "$CLOUD9_DIR" ]; then
+	echo "  * Found \"./$CLOUD9_DIR/\""
 else
 	if ! which git >/dev/null; then
 		echo "  * Installing git ..."
@@ -74,11 +78,11 @@ else
 	fi
 
 	echo "  * Downloading cloud9 ..."
-	git clone https://github.com/ajaxorg/cloud9.git cloud9
+	git clone --branch="$CLOUD9_VER" https://github.com/ajaxorg/cloud9.git "$CLOUD9_DIR"
 
-	echo "  * Building cloud9 in ./cloud9/ ..."
-	source ./nodeenv/bin/activate
-	cd cloud9
+	echo "  * Building cloud9 in \"./$CLOUD9_DIR/\" ..."
+	source "./$NODEENV_DIR/bin/activate"
+	cd "$CLOUD9_DIR"
 	npm install
 	cd ..
 	deactivate_node
@@ -88,22 +92,24 @@ echo
 
 # node-webkit
 echo "Checking node-webkit client ..."
-if [ -d node-webkit ]; then
-	echo "  * Found ./node-webkit/"
+NW_VER="0.8.0"
+NW_DIR="node-webkit"
+if [ -d "$NW_DIR" ]; then
+	echo "  * Found \"./$NW_DIR/\""
 else
-	echo "  * Downloading node-webkit to ./node-webkit/ ..."
+	echo "  * Downloading node-webkit to \"./$NW_DIR/\" ..."
 	case "$SYS_NAME" in
 
 	 Linux)
 		if [ $(uname -i) = "x86_64" ]; then
-			curl https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-linux-x64.tar.gz | tar -xzf-
-			mv node-webkit-v0.8.0-linux-x64 node-webkit
+			curl "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-linux-x64.tar.gz" | tar -xzf-
+			mv "node-webkit-v$NW_VER-linux-x64" "$NW_DIR"
 		else
-			curl https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-linux-ia32.tar.gz | tar -xzf-
-			mv node-webkit-v0.8.0-linux-ia32 node-webkit
+			curl "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-linux-ia32.tar.gz" | tar -xzf-
+			mv "node-webkit-v$NW_VER-linux-ia32" "$NW_DIR"
 		fi
 
-		if ldd node-webkit/nw | grep -q 'libudev.so.0 => not found'; then
+		if ldd "$NW_DIR/nw" | grep -q 'libudev.so.0 => not found'; then
 			echo "  * Installing libudev0 ..."
 			sudo apt-get install libudev0
 		fi
@@ -111,9 +117,9 @@ else
 
 	 Darwin)
 		#TODO: unzip from piped stdin instead?
-		curl -O https://s3.amazonaws.com/node-webkit/v0.8.0/node-webkit-v0.8.0-osx-ia32.zip
-		unzip node-webkit-v0.8.0-osx-ia32.zip
-		rm node-webkit-v0.8.0-osx-ia32.zip
+		curl -O "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
+		unzip "node-webkit-v$NW_VER-osx-ia32.zip"
+		rm "node-webkit-v$NW_VER-osx-ia32.zip"
 		mv node-webkit.app C9.app
 		cp darwin/Info.plist C9.app/Contents/Info.plist 
 		cp darwin/nw.icns C9.app/Contents/Resources/nw.icns 
@@ -145,6 +151,6 @@ case "$SYS_NAME" in
 	echo "  ./c9.sh"
 	;;
  Darwin)
-	echo "  open ./C9.app    # to open from here, or open via Finder or Spotlight"
+	echo "  open ./C9.app    # to open from here, or open via Finder, or using Spotlight"
 	;;
 esac

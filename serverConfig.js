@@ -1,6 +1,5 @@
 // Augment default cloud9 server settings
-var child_process = require("child_process"),
-	plugins = require("./cloud9/configs/default");
+var plugins = require("./cloud9/configs/default");
 
 // Make sure that /usr/local/bin/ is in the PATH since launching via the GUI doesn't usually include it on OS X
 if(/\/usr\/local\/bin\/?/.test(process.env.PATH)){

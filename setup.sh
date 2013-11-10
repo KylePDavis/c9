@@ -132,9 +132,9 @@ echo
 # c9.sh symlink
 SYS_NAME_DIR=$(echo "$SYS_NAME" | tr [A-Z] [a-z])
 if [ -L c9.sh ]; then
-	ln -s "$SYS_NAME_DIR/c9.sh" c9.sh
-else
 	echo "  * Found ./c9.sh symlink"
+else
+	ln -s "$SYS_NAME_DIR/c9.sh" c9.sh
 fi
 
 

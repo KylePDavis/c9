@@ -12,19 +12,25 @@ with({get $() { return window.$; }}){ //NOTE: a HACK to get correct reference af
 var Main = module.exports = {
 
 	commands: {
-		app:{
-			quit: function(){
+
+		app: {
+			quit: function() {
 				gui.App.closeAllWindows();
 			}
 		},
+
 		workspaces: {
+
 			open: function () {
 				setTimeout(function () { //NOTE: needed a bit more time on Mac OS X to avoid a new folder dialog in the open dialog
 					Dialogs.getDirectory(function(dir){
-						Workspaces.open(dir);
+						Workspaces.open(dir, function(err, $workspaceFrame){
+							if(err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
+						});
 					});
 				}, 100);
 			},
+
 			reload: function () {
 				var $activeTab = Tabs.getActive(),
 					$tabElement = $activeTab[0].$element;
@@ -32,24 +38,30 @@ var Main = module.exports = {
 					Workspaces.reload($tabElement);
 				}
 			},
+
 			previous: function () {
 				var $activeTab = Tabs.getActive(),
 					$previousTab = Tabs.getPrevious($activeTab);
 				Tabs.activate($previousTab);
 			},
+
 			next: function () {
 				var $activeTab = Tabs.getActive(),
 					$nextTab = Tabs.getNext($activeTab);
 				Tabs.activate($nextTab);
 			},
+
 			close: function () {
 				var $activeTab = Tabs.getActive(),
 					$nextTab = Tabs.getNext($activeTab);
 				Tabs.remove($activeTab);
 				Tabs.activate($nextTab);
 			}
+
 		},
+
 		"window": {
+
 			zoom: function () {
 				var win = gui.Window.get();
 				if (win._isMaximized) {
@@ -58,7 +70,9 @@ var Main = module.exports = {
 					win.maximize();
 				}
 			}
+
 		}
+
 	},
 
 	init: function(){
@@ -137,10 +151,12 @@ var Main = module.exports = {
 					$tab[0].$element = $frame;
 					Tabs.setTooltip($tab, server.dir);
 					Tabs.activate($tab);
+					Log.out("Opened workspace " + JSON.stringify(server.id) + "; ", {dir:server.dir, url:server.url});
 				})
 				.on("closed", function(e, $frame){
 					var $tab = $frame[0].$tab;
 					Tabs.remove($tab);
+					Log.out("Closed workspace " + JSON.stringify(server.id) + "; ", {dir:server.dir, url:server.url});
 				});
 
 			// Trigger ready styles

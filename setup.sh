@@ -66,6 +66,29 @@ fi
 echo
 
 
+# package dependencies
+#TODO: this is kind of a hack since node-webkit is using a much newer version of node but it works for now
+echo "Checking package dependencies ..."
+if [ -d "node_modules" ]; then
+	echo "  * Found \"./node_modules/\""
+	if [ "$npm_lifecycle_event" != "install" ]; then
+		echo "    * Updating package dependencies ..."
+		(
+			unset IFS; unset $(env | grep '^npm_' | cut -f1 -d=) #NOTE: to avoid weird issues with npm calling a script that calls npm
+			. "$NODEENV_DIR/bin/activate"
+			npm update
+		)
+	fi
+else
+	echo "  * Installing package dependencies ..."
+	(
+		. "$NODEENV_DIR/bin/activate"
+		npm install
+	)
+fi
+echo
+
+
 # cloud9
 CLOUD9_VER="master"
 CLOUD9_DIR="cloud9"

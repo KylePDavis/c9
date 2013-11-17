@@ -2,6 +2,7 @@
 var path = require("path"),
 	net = require("net"),
 	gui = process.gui || require("nw.gui"),
+	async = require("async"),
 	Config = require("./Config").init(),
 	Log = require("./Log").init();
 
@@ -35,9 +36,9 @@ var Servers = module.exports = {
 				var port = Servers._nextPort;
 				Servers._nextPort++;
 				svr.once("close", function(){
-					callback(port);
+					return callback(port);
 				});
-				svr.close();
+				return svr.close();
 			})
 			.on("error", function(err){
 				Log.dbg("Servers.findNextPort port=%s error (%s); next ...", Servers._nextPort, err);
@@ -48,57 +49,92 @@ var Servers = module.exports = {
 	},
 
 	/**
+	 * Start a new instance of the cloud9 server for a workspace
 	 * @method start
 	 * @static
-	 * @param dir
-	 * @param [port]
-	 * @param [ip]
+	 * @param dir                    {String}    The workspace directory that the cloud9 server will use for reading and writing files
+	 * @param [options]              {Object}    Options for the cloud9 server
+	 * @param   [options.ip]           {String}    The IP that the cloud9 server will bind to (DEFAULT: current IP)
+	 * @param   [options.port]         {Number}    The port that the cloud9 server will listen on (DEFAULT: next port)
+	 * @param   [options.debugPort]    {Number}    The port that the cloud9 server will use for the debugger process (DEFAULT: next port)
+	 * @param callback               {Function}  A function that will be called back with the server instance once it has been created; i.e., `callback(err, server)`
 	 **/
-	start: function start(dir, port, ip){
-		var childProcess = require("child_process"),
-			readline = require("readline"),
-			nodeEnvDir = process.cwd() + "/nodeenv",
-			nodeBin = nodeEnvDir + "/bin/node",
-			nodeArgs = [process.cwd() + "/cloud9/server.js", process.cwd() + "/serverConfig", "-w", dir];
-		if (!ip) ip = Config.current.ip;
-		Log.out("Starting new C9 server process: ", {bin:nodeBin, args:nodeArgs, env:process.env});
-		process.env.IP = ip;
-		process.env.PORT = port;
-		var server = childProcess.spawn(nodeBin, nodeArgs, {
-				env: process.env
-			})
-			.on("exit", function (code, signal) {
-				if (code) {
-					var msg = "Internal Error:\nc9 server process exited with code " + code;
-					console.error(msg);
-					window.alert(msg);
+	start: function start(dir, options, callback){
+		// parse args
+		if(typeof dir !== "string") throw new Error("Servers.start arg #1 must be workspace dir string");
+		if(options instanceof Function) callback = options, options = undefined;
+		// resolve options
+		if(options === undefined) options = {};
+		if(!(options.ip && typeof options.ip === "string")) options.ip = Config.current.ip;
+		async.series( // resolution of some options must be done asyncly
+			[
+				function findPort(next){
+					if(options.port) return next();
+					Servers.findNextPort(function(port){
+						options.port = port;
+						return next();
+					});
+				},
+				function findDebugPort(next){
+					if(options.debugPort) return next();
+					Servers.findNextPort(function(debugPort){
+						options.debugPort = debugPort;
+						return next();
+					});
 				}
-				server.stdin.end();
-				Servers.stop(server);
-			});
-		var outReader = readline.createInterface({
-				input: server.stdout,
-				output: process.stdout
-			})
-			.on("line", Log.out)	//TODO: include workspace / server id?
-			.on("line", function(line){
-				if (/^IDE server initialized. Listening on/.test(line)) {
-					server.emit("ready");
-				}
-			});
-		var errReader = readline.createInterface({
-				input: server.stderr,
-				output: process.stderr
-			})
-			.on("line", Log.err);	//TODO: include workspace / server id?
+			],
+			function resolvedOptions(err){
+				if(err) return callback(err);
+				var childProcess = require("child_process"),
+					readline = require("readline"),
+					appDir = process.cwd(),
+					nodeEnvDir = appDir + "/nodeenv",
+					nodeBin = nodeEnvDir + "/bin/node",
+					nodeArgs = [appDir + "/cloud9/server.js", appDir + "/serverConfig", "-w", dir];
+				process.env.IP = options.ip || Config.current.ip;
+				process.env.PORT = options.port;
+				process.env.DEBUG_PORT = options.debugPort;
+				Log.out("Starting new C9 server process: ", {bin:nodeBin, args:nodeArgs, env:JSON.parse(JSON.stringify(process.env))});
+				var server = childProcess.spawn(nodeBin, nodeArgs, {
+						env: process.env
+					})
+					.on("exit", function (code, signal) {
+						if (code) {
+							var msg = "Internal Error:\nc9 server process exited with code " + code;
+							console.error(msg);
+							window.alert(msg);
+						}
+						server.stdin.end();
+						Servers.stop(server);
+					});
 
-		server.id = path.basename(dir); //Servers.list.length; //TODO: handle collisions
-		server.dir = dir;
-		server.url = "http://" + ip + ":" + port + "/?noworker=1";
+				server.id = path.basename(dir); //Servers.list.length; //TODO: handle collisions
+				server.dir = dir;
+				server.options = options;
+				server.url = "http://" + options.ip + ":" + options.port + "/?noworker=1";
 
-		Servers.list.push(server);
+				Servers.list.push(server);
 
-		return server;
+				callback(null, server);
+
+				var outReader = readline.createInterface({
+						input: server.stdout,
+						output: process.stdout
+					})
+					.on("line", Log.out)	//TODO: include workspace / server id?
+					.on("line", function(line){
+						if (/^IDE server initialized. Listening on/.test(line)) {
+							server.emit("ready");
+						}
+					});
+				var errReader = readline.createInterface({
+						input: server.stderr,
+						output: process.stderr
+					})
+					.on("line", Log.err);	//TODO: include workspace / server id?
+
+			}
+		);
 	},
 
 	stop: function stop(server){

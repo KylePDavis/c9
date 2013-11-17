@@ -11,6 +11,7 @@
 # SETUP OUTPUTS
 /cloud9/
 /nodeenv/
+/node_modules/
 /node-webkit/
 /c9.sh
 
@@ -18,4 +19,3 @@
 /C9.app
 /credits.html
 /nwsnapshot
-

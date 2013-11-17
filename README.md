@@ -15,7 +15,6 @@ Installation
 
 TODO
 ----
-* c9: use defaults.xml for new workspaces that do not already have a ".settings" file
 * c9: save history of most recently used workspace directories
 * c9: open workspaces save on quit, restore on load
 * c9: workspace tab close button

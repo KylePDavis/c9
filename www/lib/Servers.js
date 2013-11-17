@@ -1,6 +1,9 @@
 /*jshint browser:true, node:true*/
 var path = require("path"),
+	fs = require("fs"),
 	net = require("net"),
+	childProcess = require("child_process"),
+	readline = require("readline"),
 	gui = process.gui || require("nw.gui"),
 	async = require("async"),
 	Config = require("./Config").init(),
@@ -28,6 +31,12 @@ var Servers = module.exports = {
 
 	_nextPort: Config.current.basePort,
 
+	/**
+	 * Find the next available TCP port
+	 * @method findNextPort
+	 * @static
+	 * @param callback  {Function}  A function that will be called back with the port once it has been created; i.e., `callback(port)`
+	 **/
 	findNextPort: function findNextPort(callback){
 		Log.dbg("Servers.findNextPort port=%s available?", Servers._nextPort);
 		var svr = net.createServer()
@@ -63,37 +72,61 @@ var Servers = module.exports = {
 		// parse args
 		if(typeof dir !== "string") throw new Error("Servers.start arg #1 must be workspace dir string");
 		if(options instanceof Function) callback = options, options = undefined;
-		// resolve options
 		if(options === undefined) options = {};
+
+		// resolve options that can be determined syncronously
 		if(!(options.ip && typeof options.ip === "string")) options.ip = Config.current.ip;
-		async.series( // resolution of some options must be done asyncly
+
+		// resolve more options, prepare workspace, and start server
+		async.series(
 			[
-				function findPort(next){
-					if(options.port) return next();
-					Servers.findNextPort(function(port){
+
+				function resolveOptionPort(next) {
+					if (options.port) return next();
+					Servers.findNextPort(function(port) {
 						options.port = port;
 						return next();
 					});
 				},
-				function findDebugPort(next){
-					if(options.debugPort) return next();
-					Servers.findNextPort(function(debugPort){
+
+				function resolveOptionDebugPort(next) {
+					if (options.debugPort) return next();
+					Servers.findNextPort(function(debugPort) {
 						options.debugPort = debugPort;
 						return next();
 					});
 				}
+
 			],
-			function resolvedOptions(err){
+
+			function donePreparing(err){
 				if(err) return callback(err);
-				var childProcess = require("child_process"),
-					readline = require("readline"),
-					appDir = process.cwd(),
+
+				var appDir = process.cwd(),
 					nodeEnvDir = appDir + "/nodeenv",
 					nodeBin = nodeEnvDir + "/bin/node",
 					nodeArgs = [appDir + "/cloud9/server.js", appDir + "/serverConfig", "-w", dir];
-				process.env.IP = options.ip || Config.current.ip;
+
+				// prepare workspace default settings if possible
+				var defaultSettingsFile = path.join(appDir, "defaults.xml"),
+					settingsFile = path.join(dir, ".settings");
+				try {
+					var defaultSettingsData = fs.readFileSync(defaultSettingsFile);
+					fs.writeFileSync(settingsFile, defaultSettingsData, {
+						flag: "wx"
+					});
+				} catch (prepErr) {
+					var ignoredErrorCodes = ["EEXIST", "EACCES"];
+					console.error("SERVER WORKSPACE PREP ERROR:", {e:prepErr});
+					if (ignoredErrorCodes.indexOf(prepErr.code) === -1) throw prepErr;
+				}
+
+				// send some options through environment vars
+				process.env.IP = options.ip;
 				process.env.PORT = options.port;
 				process.env.DEBUG_PORT = options.debugPort;
+
+				// start process
 				Log.out("Starting new C9 server process: ", {bin:nodeBin, args:nodeArgs, env:JSON.parse(JSON.stringify(process.env))});
 				var server = childProcess.spawn(nodeBin, nodeArgs, {
 						env: process.env

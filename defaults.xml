@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <settings time="1381674957257">
-  <general animateui="true" revealfile="false" confirmexit="false">
+  <general animateui="true" revealfile="true" confirmexit="false">
     <keybindings preset="auto"/>
   </general>
   <auto>
@@ -17,9 +17,9 @@
   </auto>
   <breakpoints/>
   <beautify>
-    <jsbeautify preserveempty="true" keeparrayindentation="false" jslinthappy="false" braces="end-expand" space_before_conditional="true" unescape_strings="true"/>
+    <jsbeautify preserveempty="true" keeparrayindentation="false" jslinthappy="false" braces="collapse" space_before_conditional="true" unescape_strings="true"/>
   </beautify>
   <editors>
-    <code stripws="false"/>
+    <code stripws="true"/>
   </editors>
 </settings>

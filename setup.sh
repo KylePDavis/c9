@@ -78,7 +78,7 @@ else
 	fi
 
 	echo "  * Downloading cloud9 ..."
-	git clone --branch="$CLOUD9_VER" https://github.com/ajaxorg/cloud9.git "$CLOUD9_DIR"
+	git clone --branch="$CLOUD9_VER" --depth 1 https://github.com/ajaxorg/cloud9.git "$CLOUD9_DIR"
 
 	echo "  * Building cloud9 in \"./$CLOUD9_DIR/\" ..."
 	source "./$NODEENV_DIR/bin/activate"

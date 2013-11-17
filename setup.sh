@@ -37,6 +37,7 @@ case "$SYS_NAME" in
 	exit 3;
 	;;
 esac
+echo
 
 
 # nodeenv
@@ -136,12 +137,15 @@ echo
 
 
 # c9.sh symlink
+echo "Checking links ..."
 SYS_NAME_DIR=$(echo "$SYS_NAME" | tr [A-Z] [a-z])
 if [ -L c9.sh ]; then
 	echo "  * Found ./c9.sh symlink"
 else
+	echo "  * Creating ./c9.sh symlink"
 	ln -s "$SYS_NAME_DIR/c9.sh" c9.sh
 fi
+echo
 
 
 # Outro

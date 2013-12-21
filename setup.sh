@@ -116,7 +116,7 @@ echo
 
 # node-webkit
 echo "Checking node-webkit client ..."
-NW_VER="0.8.0"
+NW_VER="0.8.3"
 NW_DIR="node-webkit"
 if [ -d "$NW_DIR" ]; then
 	echo "  * Found \"./$NW_DIR/\""
@@ -142,7 +142,7 @@ else
 	 Darwin)
 		#TODO: unzip from piped stdin instead?
 		curl -O "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
-		unzip "node-webkit-v$NW_VER-osx-ia32.zip"
+		unzip -n "node-webkit-v$NW_VER-osx-ia32.zip"
 		rm "node-webkit-v$NW_VER-osx-ia32.zip"
 		mv node-webkit.app C9.app
 		cp darwin/Info.plist C9.app/Contents/Info.plist 

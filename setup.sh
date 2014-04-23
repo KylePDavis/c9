@@ -139,8 +139,12 @@ else
 		fi
 
 		if ldd "$NW_DIR/nw" | grep -q 'libudev.so.0 => not found'; then
-			echo "  * Installing libudev0 ..."
-			sudo apt-get install libudev0
+			echo "  * Installing libudev ..."
+			sudo apt-get install libudev?
+			if ldd "$NW_DIR/nw" | grep -q 'libudev.so.0 => not found'; then
+				# rewrite libudev.so.0 as libudev.so.1 internally -- https://github.com/rogerwang/node-webkit/wiki/The-solution-of-lacking-libudev.so.0
+				sed -i 's/\x75\x64\x65\x76\x2E\x73\x6F\x2E\x30/\x75\x64\x65\x76\x2E\x73\x6F\x2E\x31/g' "$NW_DIR/nw"
+			fi
 		fi
 		;;
 

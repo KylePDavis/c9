@@ -61,9 +61,14 @@ else
 	echo "  * Building node env in \"./$NODEENV_DIR/\" ..."
 	# build node env for your computer
 	nodeenv --node="$NODEENV_VER" --jobs=4 --clean-src "./$NODEENV_DIR/"
-	#TODO: still randomly breaking on requests?   nodeenv --node=0.8.25 --jobs=4 --clean-src "./$NODEENV_DIR/"
+	#TODO: still randomly breaking on requests?   nodeenv --node=0.8.26 --jobs=4 --clean-src "./$NODEENV_DIR/"
 fi
 echo
+
+
+# curl
+[ -x "$CURL_BIN" ]  ||  CURL_BIN=$(which curl)
+[ -x "$CURL_BIN" ]  ||  sudo apt-get install curl
 
 
 # package dependencies
@@ -116,7 +121,7 @@ echo
 
 # node-webkit
 echo "Checking node-webkit client ..."
-NW_VER="0.8.3"
+NW_VER="0.9.2"
 NW_DIR="node-webkit"
 if [ -d "$NW_DIR" ]; then
 	echo "  * Found \"./$NW_DIR/\""
@@ -124,12 +129,12 @@ else
 	echo "  * Downloading node-webkit to \"./$NW_DIR/\" ..."
 	case "$SYS_NAME" in
 
-	 Linux)
+	Linux)
 		if [ $(uname -i) = "x86_64" ]; then
-			curl "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-linux-x64.tar.gz" | tar -xzf-
+			curl "http://dl.node-webkit.org/v$NW_VER/node-webkit-v$NW_VER-linux-x64.tar.gz" | tar -xzf-
 			mv "node-webkit-v$NW_VER-linux-x64" "$NW_DIR"
 		else
-			curl "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-linux-ia32.tar.gz" | tar -xzf-
+			curl "http://dl.node-webkit.org/v$NW_VER/node-webkit-v$NW_VER-linux-ia32.tar.gz" | tar -xzf-
 			mv "node-webkit-v$NW_VER-linux-ia32" "$NW_DIR"
 		fi
 
@@ -139,14 +144,14 @@ else
 		fi
 		;;
 
-	 Darwin)
+	Darwin)
 		#TODO: unzip from piped stdin instead?
 		curl -O "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
 		unzip -n "node-webkit-v$NW_VER-osx-ia32.zip"
 		rm "node-webkit-v$NW_VER-osx-ia32.zip"
 		mv node-webkit.app C9.app
-		cp darwin/Info.plist C9.app/Contents/Info.plist 
-		cp darwin/nw.icns C9.app/Contents/Resources/nw.icns 
+		cp darwin/Info.plist C9.app/Contents/Info.plist
+		cp darwin/nw.icns C9.app/Contents/Resources/nw.icns
 		;;
 
 	*)
@@ -174,10 +179,10 @@ echo
 # Outro
 echo "Now you can run:"
 case "$SYS_NAME" in
- Linux)
-	echo "  ./c9.sh"
-	;;
- Darwin)
-	echo "  open ./C9.app    # to open from here, or open via Finder, or using Spotlight"
-	;;
+	Linux)
+		echo "  ./c9.sh"
+		;;
+	Darwin)
+		echo "  open ./C9.app    # to open from here, or open via Finder, or using Spotlight"
+		;;
 esac

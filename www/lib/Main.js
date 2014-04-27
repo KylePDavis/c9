@@ -5,6 +5,7 @@ var gui = process.gui || require("nw.gui"),
 	Log = require("./Log").init(),
 	Servers = require("./Servers").init(),
 	Workspaces = require("./Workspaces").init(),
+	fs = require("fs"),
 	$ = window.$;
 with({get $() { return window.$; }}){ //NOTE: a HACK to get correct reference after window reload
 
@@ -98,6 +99,23 @@ var Main = module.exports = {
 
 		//TODO: save / restore  window size
 		//TODO: save / restore  open workspaces
+
+
+		// Handle startup args
+		gui.App.argv.forEach(function(dir, i) {
+			fs.stat(dir, function(err, stat) {
+				if (err) return Log.err("Unable to open workspace for %j; ERROR: %j", err);
+				Log.out("Opening workspace for: %j", dir);
+				Workspaces.open(dir, function(err, $workspaceFrame) {
+					if (err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
+				});
+			});
+		});
+		//// TODO: Listen to `open` event for subsequent runs
+		//gui.App.on("open", function(cmdline) {
+		//	Log.out("Got command line: %j", cmdline);
+		//});
+
 
 		// Get window
 		var win = gui.Window.get();

@@ -19,9 +19,9 @@ var Servers = module.exports = {
 		if(Servers.isInitialized) return Servers;
 		var win = gui.Window.get();
 		win.on("close", function(){
-			this.hide();
+			win.hide();
 			Servers.stopAll();
-			this.close(true);
+			win.close(true);
 		});
 		Servers.isInitialized = true;
 		return Servers;

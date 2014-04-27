@@ -14,15 +14,15 @@ var Dialogs = module.exports = {
 	init: function init(){
 		if(Dialogs.isInitialized) return Dialogs;
 		Dialogs.$dialogs = $('<div id="dialogs"/>').hide().appendTo(window.document.body);
-		Dialogs.$dialogs.append('<input type="file" nwdirectory />');
 		return Dialogs;
 	},
 
 	getDirectory: function getDirectory(callback){
-		var $dialog = Dialogs.$dialogs.children("input[nwdirectory]")
-			.val("") // clear old value
+		Dialogs.$dialogs.remove("input[nwdirectory]");
+		var $dialog = $('<input type="file" nwdirectory />')
+			.appendTo(Dialogs.$dialogs)
 			.click() // trigger dialog show
-			.one("change", function(){
+			.one("change", function(e){
 				var dir = $dialog.val();
 				return callback(dir);
 			});

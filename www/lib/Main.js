@@ -14,16 +14,18 @@ var Main = module.exports = {
 	commands: {
 
 		app: {
+
 			quit: function() {
 				gui.App.closeAllWindows();
 			}
+
 		},
 
-		workspaces: {
+		workspace: {
 
 			open: function () {
 				setTimeout(function () { //NOTE: needed a bit more time on Mac OS X to avoid a new folder dialog in the open dialog
-					Dialogs.getDirectory(function(dir){
+					Dialogs.getDirectory(function(dir){ //TODO: BUG: if you cancel these callbacks get queued up somehow ...
 						Workspaces.open(dir, function(err, $workspaceFrame){
 							if(err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
 						});
@@ -53,7 +55,7 @@ var Main = module.exports = {
 
 			close: function () {
 				var $activeTab = Tabs.getActive(),
-					$nextTab = Tabs.getNext($activeTab);
+					$nextTab = Tabs.getPrevious($activeTab);
 				Tabs.remove($activeTab);
 				Tabs.activate($nextTab);
 			}
@@ -68,6 +70,23 @@ var Main = module.exports = {
 					win.unmaximize();
 				} else {
 					win.maximize();
+				}
+			}
+
+		},
+
+		debug: {
+
+			reload: function() { //TODO: currently broken
+				window.location.reload();
+			},
+
+			tools: function() {
+				var win = gui.Window.get();
+				if (win.isDevToolsOpen()) {
+					win.closeDevTools();
+				} else {
+					win.showDevTools();
 				}
 			}
 
@@ -93,25 +112,42 @@ var Main = module.exports = {
 
 		// Setup menubar
 		var menubar = new gui.Menu({type:"menubar"});
+		var item, submenu;
+
+		// Add the main menu
+		if(process.platform !== "darwin"){
+			item = new gui.MenuItem({label:"App"});
+			menubar.append(item);
+			submenu = new gui.Menu();
+			item.submenu = submenu;
+			submenu.append(new gui.MenuItem({label:"Quit"}).on("click", Main.commands.app.quit));
+		}
 
 		// Add the Workspace menu
-		var item = new gui.MenuItem({label:"Workspace"});
+		item = new gui.MenuItem({label:"Workspace"});
 		menubar.append(item);
-		var submenu = new gui.Menu();
+		submenu = new gui.Menu();
 		item.submenu = submenu;
-		submenu.append(new gui.MenuItem({label:"Open ..."}).on("click", Main.commands.workspaces.open));
-		submenu.append(new gui.MenuItem({label:"Reload"}).on("click", Main.commands.workspaces.reload));
-		submenu.append(new gui.MenuItem({label:"Previous"}).on("click", Main.commands.workspaces.previous));
-		submenu.append(new gui.MenuItem({label:"Next"}).on("click", Main.commands.workspaces.next));
-		submenu.append(new gui.MenuItem({label:"Close"}).on("click", Main.commands.workspaces.close));
+		submenu.append(new gui.MenuItem({label:"Open ..."}).on("click", Main.commands.workspace.open));
+		submenu.append(new gui.MenuItem({label:"Reload"}).on("click", Main.commands.workspace.reload));
+		submenu.append(new gui.MenuItem({label:"Previous"}).on("click", Main.commands.workspace.previous));
+		submenu.append(new gui.MenuItem({label:"Next"}).on("click", Main.commands.workspace.next));
+		submenu.append(new gui.MenuItem({label:"Close"}).on("click", Main.commands.workspace.close));
 
+		// Add the Window menu
 		if(process.platform === "darwin"){
-			// Add the Window menu
 			item = new gui.MenuItem({label:"Window"});
 			menubar.append(item);
 			submenu = item.submenu = new gui.Menu();
 			submenu.append(new gui.MenuItem({label:"Zoom"}).on("click", Main.commands.window.zoom));
 		}
+
+		// Add the Debug menu
+		item = new gui.MenuItem({label:"Debug"});
+		menubar.append(item);
+		submenu = item.submenu = new gui.Menu();
+		submenu.append(new gui.MenuItem({label:"Tools"}).on("click", Main.commands.debug.tools));
+		//TODO: submenu.append(new gui.MenuItem({label:"Reload"}).on("click", Main.commands.debug.reload));
 
 		// Attach menu to (and extend) the default node-webkit menu
 		win.menu = menubar;
@@ -130,8 +166,8 @@ var Main = module.exports = {
 					}else{
 						Log.$logs.hide();
 					}
-					Tabs.$tabs.each(function(){
-						this.$element.hide();
+					Tabs.$tabs.each(function(i, $tab){
+						$tab.$element.hide();
 					});
 					$tab[0].$element.show();
 					$tab[0].$element.focus();
@@ -154,7 +190,8 @@ var Main = module.exports = {
 					Log.out("Opened workspace " + JSON.stringify(server.id) + "; ", {dir:server.dir, url:server.url});
 				})
 				.on("closed", function(e, $frame){
-					var $tab = $frame[0].$tab;
+					var server = $frame[0].server,
+						$tab = $frame[0].$tab;
 					Tabs.remove($tab);
 					Log.out("Closed workspace " + JSON.stringify(server.id) + "; ", {dir:server.dir, url:server.url});
 				});
@@ -178,7 +215,7 @@ var Main = module.exports = {
 
 
 			if (cmdKey && !e.altKey && e.shiftKey && e.keyCode === 79) { // Cmd+Shift+O
-				Main.commands.workspaces.open();
+				Main.commands.workspace.open();
 				return false;
 			}
 
@@ -188,17 +225,17 @@ var Main = module.exports = {
 			// }
 
 			if (cmdKey && !e.altKey && e.shiftKey && e.keyCode === 219) { // Cmd+Shift+[
-				Main.commands.workspaces.previous();
+				Main.commands.workspace.previous();
 				return false;
 			}
 
 			if (cmdKey && !e.altKey && e.shiftKey && e.keyCode === 221) { // Cmd+Shift+]
-				Main.commands.workspaces.next();
+				Main.commands.workspace.next();
 				return false;
 			}
 
 			if (cmdKey && !e.altKey && e.shiftKey && e.keyCode === 87) { // Cmd+Shift+W
-				Main.commands.workspaces.close();
+				Main.commands.workspace.close();
 				return false;
 			}
 

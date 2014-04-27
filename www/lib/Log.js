@@ -14,7 +14,7 @@ var Log = module.exports = {
 
 	init: function init(){
 		if(Log.isInitialized) return Log;
-		Log.$logs = $('<div id="logs"/>').appendTo(window.document.body);
+		Log.$logs = $('<div id="logs" class="rounded"/>').appendTo(window.document.body);
 		Log.$logs.append("<h2>Logs</h2>");
 		Log.$logsMsgs = $("<pre/>").appendTo(Log.$logs);
 		return Log;

@@ -20,6 +20,6 @@
     <jsbeautify preserveempty="true" keeparrayindentation="false" jslinthappy="false" braces="collapse" space_before_conditional="true" unescape_strings="true"/>
   </beautify>
   <editors>
-    <code stripws="true"/>
+    <code stripws="true" softtabs="false"/>
   </editors>
 </settings>

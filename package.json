@@ -17,7 +17,7 @@
   "scripts": {
     "install": "./setup.sh",
     "start": "./c9.sh",
-    "clean": "for F in cloud9/ nodeenv/ node_modules/ node-webkit/ c9.sh C9.app/ credits.html nwsnapshot; do echo \"rm -fr $F ...\"; rm -fr \"$F\"; done"
+    "clean": "./clean.sh"
   },
   "dependencies": {
     "async": "~0.2.9"

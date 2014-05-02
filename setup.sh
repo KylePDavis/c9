@@ -150,7 +150,7 @@ else
 
 	Darwin)
 		#TODO: unzip from piped stdin instead?
-		curl -O "https://s3.amazonaws.com/node-webkit/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
+		curl -O "http://dl.node-webkit.org/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
 		unzip -n "node-webkit-v$NW_VER-osx-ia32.zip"
 		rm "node-webkit-v$NW_VER-osx-ia32.zip"
 		mv node-webkit.app C9.app

@@ -31,7 +31,7 @@
     "height": 700,
     "min_height": 500,
     "min_width": 500,
-    "show": true,
+    "position": "mouse",
     "toolbar": false,
     "frame": true
   }

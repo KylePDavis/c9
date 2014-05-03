@@ -28,7 +28,7 @@ var Workspaces = module.exports = {
 		Servers.start(dir, function(err, server){
 			if(err) return callback(err);
 			server.on("ready", function() {
-				var $workspaceFrame = $("<iframe nwdisable src='" + server.url + "' onload='this.contentWindow.onkeydown=window.top.onkeydown'/>")
+				var $workspaceFrame = $("<iframe nwdisable nwfaketop src='" + server.url + "' onload='this.contentWindow.onkeydown=window.top.onkeydown'/>")
 					.appendTo(Workspaces.$container);
 				$workspaceFrame[0].server = server;
 				Workspaces.$container.triggerHandler("opened", [$workspaceFrame]);

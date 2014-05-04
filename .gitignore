@@ -2,7 +2,7 @@
 .DS_Store
 
 # ViM stuff
-*.swp
+*.sw?
 
 # Ignore Cloud9 settings in C9 dir
 /.settings

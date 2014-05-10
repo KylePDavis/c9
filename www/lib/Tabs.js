@@ -36,10 +36,15 @@ var Tabs = module.exports = {	//TODO: rename to Tabs
 		return Tabs.$container.on(eventName, handlerFn);
 	},
 
-	add: function add(title){
-		var $tab = $($(Tabs.TAB_HTML).appendTo(Tabs.$container));
-		Tabs.setTitle($tab, title);
+	add: function add(opts){
+		var $tab = $(Tabs.TAB_HTML).appendTo(Tabs.$container);
+		if (opts.title) Tabs.setTitle($tab, opts.title);
+		if (opts.tooltip) Tabs.setTooltip($tab, opts.tooltip);
 		$tab.on("click", Tabs.activate.bind(Tabs, $tab));
+		$tab.find(".tab_x").on("click", function(e) {
+			Tabs.remove($tab);
+			return false;
+		});
 		Tabs.$container.triggerHandler("added", [$tab]);
 		return $tab;
 	},
@@ -61,9 +66,12 @@ var Tabs = module.exports = {	//TODO: rename to Tabs
 
 	activate: function activate($tab){
 		var $oldTab = Tabs.$container.children(".tab.active");
-		$oldTab.removeClass("active");
-		$oldTab.triggerHandler("deactivated", [$oldTab]);
-		Tabs.$container.triggerHandler("deactivated", $oldTab);
+		if ($oldTab[0] === $tab[0]) return;
+		if ($oldTab[0]) {
+			$oldTab.removeClass("active");
+			$oldTab.triggerHandler("deactivated", [$oldTab]);
+			Tabs.$container.triggerHandler("deactivated", $oldTab);
+		}
 		$tab.addClass("active");
 		$tab.triggerHandler("activated", [$tab]);
 		Tabs.$container.triggerHandler("activated", [$tab]);

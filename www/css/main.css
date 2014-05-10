@@ -246,3 +246,15 @@ body.ready > #logs {
 	background-position: 0 0;
 	top: 8px;
 }
+#tabs .tab.active .tab_middle .tab_x:hover {
+	background-position: -14px 0;
+}
+#tabs .tab.active .tab_middle .tab_x:active {
+	background-position: -28px 0;
+}
+#tabs .tab .tab_middle .tab_x:hover {
+	background-position: -14px -14px;
+}
+#tabs .tab .tab_middle .tab_x:active {
+	background-position: -28px -14px;
+}

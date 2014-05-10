@@ -55,10 +55,8 @@ var Main = module.exports = {
 			},
 
 			close: function () {
-				var $activeTab = Tabs.getActive(),
-					$nextTab = Tabs.getPrevious($activeTab);
+				var $activeTab = Tabs.getActive();
 				Tabs.remove($activeTab);
-				Tabs.activate($nextTab);
 			}
 
 		},
@@ -174,36 +172,49 @@ var Main = module.exports = {
 		// Initialize
 		$(function(){
 
-			var $welcomeTab = Tabs.activate(Tabs.add("Welcome"));
+			var $welcomeTab = Tabs.add({
+				title: "Welcome",
+				tooltip: "Welcome to C9"
+			});
 			$welcomeTab[0].$element = $("#main #welcome");
+			Tabs.activate($welcomeTab);
 
+			var $tabActivated,
+				$prevTabActivated;
 			Tabs
 				.on("activated", function(e, $tab){
-					if($tab[0] === $welcomeTab[0]){
-						Log.$logs.show();
-					}else{
-						Log.$logs.hide();
-					}
-					Tabs.$tabs.each(function(i, $tab){
-						$tab.$element.hide();
+					// track pointer to previous tab
+					$prevTabActivated = $tabActivated;
+					$tabActivated = $tab;
+					// toggle the logs based on if this is the welcome tab
+					Log.$logs.toggle($tab[0] === $welcomeTab[0]);
+					// toggle the logs based on if this is the correct tab
+					Tabs.$tabs.each(function(i, t) {
+						t.$element.toggle($tab[0] === t);
 					});
-					$tab[0].$element.show();
 					$tab[0].$element.focus();
 				})
 				.on("removed", function(e, $tab){
+					// close the workspace for the tab
 					var $tabElement = $tab[0].$element;
 					if ($tabElement.is("iframe")) { //NOTE: only do stuff for iframes
 						Workspaces.close($tabElement);
+					}
+					// if active tab was removed then select a new tab
+					if ($tab[0] === $tabActivated[0]){
+						Tabs.activate($prevTabActivated || Tabs.$tabs.first());
 					}
 				});
 
 			Workspaces
 				.on("opened", function(e, $frame){
 					var server = $frame[0].server,
-						$tab = Tabs.add(server.id);
+						$tab = Tabs.add({
+							title: server.id,
+							tooltip: server.dir
+						});
 					$frame[0].$tab = $tab;
 					$tab[0].$element = $frame;
-					Tabs.setTooltip($tab, server.dir);
 					Tabs.activate($tab);
 					Log.out("Opened workspace " + JSON.stringify(server.id) + "; ", {dir:server.dir, url:server.url});
 				})

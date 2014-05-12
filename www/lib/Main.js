@@ -28,7 +28,7 @@ var Main = module.exports = {
 				setTimeout(function () { //NOTE: needed a bit more time on Mac OS X to avoid a new folder dialog in the open dialog
 					Dialogs.getDirectory(function(dir){ //TODO: BUG: if you cancel these callbacks get queued up somehow ...
 						Workspaces.open(dir, function(err, $workspaceFrame){
-							if(err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
+							if(err) return window.alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
 						});
 					});
 				}, 100);
@@ -103,7 +103,6 @@ var Main = module.exports = {
 		gui.App.argv.forEach(function(dir, i) {
 			fs.stat(dir, function(err, stat) {
 				if (err) return Log.err("Unable to open workspace for %j; ERROR: %j", err);
-				Log.out("Opening workspace for: %j", dir);
 				Workspaces.open(dir, function(err, $workspaceFrame) {
 					if (err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(dir) + "\nMESSAGE:\n" + err);
 				});
@@ -205,6 +204,42 @@ var Main = module.exports = {
 						Tabs.activate($prevTabActivated || Tabs.$tabs.first());
 					}
 				});
+
+		// disable default drag and drop which would change the URL
+		$(window)
+			.on("dragover", function(e){
+				e.preventDefault();
+				return false;
+			})
+			.on("drop", function(e){
+				e.preventDefault();
+				return false;
+			});
+
+		// enable drags on tabs
+		Tabs
+			.on("dragenter", function(e) {
+				$(window.document.body).addClass("draghover");
+			})
+			.on("dragleave dragend drop", function(e){
+				$(window.document.body).removeClass("draghover");
+			})
+			.on("drop", function(e){
+				e.preventDefault();
+				var files = Array.apply(null, e.dataTransfer.files);
+				files.forEach(function(file) {
+					if (fs.statSync(file.path).isDirectory()) {
+						Workspaces.open(file.path, function(err, $workspaceFrame) {
+							if (err) return alert("ERROR: Unable to open workspace to " + JSON.stringify(file.path) + "\nMESSAGE:\n" + err);
+						});
+					} else {
+						window.alert("ERROR: Unable to create workspace tabs for files; only directories are supported.\n" +
+							"Drag directories into the tabs for a new workspace.\n" +
+							"Drag files into a workspace's editor to import.");
+					}
+				});
+				return false;
+			});
 
 			Workspaces
 				.on("opened", function(e, $frame){

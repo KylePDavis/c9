@@ -258,3 +258,12 @@ body.ready > #logs {
 #tabs .tab .tab_middle .tab_x:active {
 	background-position: -28px -14px;
 }
+
+body.draghover>*:not(#tabs) {
+	-webkit-filter: invert(0.2) brightness(1.2) opacity(0.5);
+	transition: -webkit-filter .3s;
+}
+body.draghover>#tabs {
+	box-shadow: 0 0 10px 10px #48f inset;
+	transition: box-shadow .3s;
+}

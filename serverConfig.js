@@ -10,6 +10,8 @@ if(/\/usr\/local\/bin\/?/.test(process.env.PATH)){
 plugins.forEach(function(plugin) {
     if (plugin.packagePath) {
 		switch (plugin.packagePath) {
+
+			// setup util scripts for running and debugging node which will detect the proper versions
 			case "./cloud9.run.node-debug":
 			case "./cloud9.run.node":
 				plugin.nodeVersions = {
@@ -19,6 +21,12 @@ plugins.forEach(function(plugin) {
 					"0.6": __dirname + "/utils/node.0.6.sh"
 				};
 				break;
+
+			// replace session files with in-memory implementation because it seems to behave more consistently
+			case "./connect.session.file":
+				plugin.packagePath = "./connect.session.memory";
+				break;
+
         }
     }
 });

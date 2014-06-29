@@ -129,6 +129,11 @@ var Main = module.exports = {
 		var menubar = new gui.Menu({type:"menubar"});
 		var item, submenu;
 
+		// Setup Mac OS X builtins
+		if (menubar.createMacBuiltin) {
+			menubar.createMacBuiltin("C9");
+		}
+
 		// Add the main menu
 		if(process.platform !== "darwin"){
 			item = new gui.MenuItem({label:"App"});
@@ -151,9 +156,16 @@ var Main = module.exports = {
 
 		// Add the Window menu
 		if(process.platform === "darwin"){
-			item = new gui.MenuItem({label:"Window"});
-			menubar.append(item);
-			submenu = item.submenu = new gui.Menu();
+			item = menubar.items.filter(function (i) {
+				return i.label === "Window";
+			})[0];
+			if (!item) {
+				item = new gui.MenuItem({label:"Window"});
+				menubar.append(item);
+				submenu = item.submenu = new gui.Menu();
+			}else{
+				submenu = item.submenu;
+			}
 			submenu.append(new gui.MenuItem({label:"Zoom"}).on("click", Main.commands.window.zoom));
 		}
 

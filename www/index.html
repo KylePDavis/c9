@@ -5,8 +5,8 @@
 
 	<script type="text/javascript" src="js/zepto.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="css/normalize.css"/>
-    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="css/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="css/main.css"/>
 
 </head>
 <body class="notready">
@@ -31,11 +31,11 @@
 
 	</div>
 
-    <script type="text/javascript">
-        process.gui = require("nw.gui");
-        var Main = require("./lib/Main");
-        Main.init();
-    </script>
+	<script type="text/javascript">
+		process.gui = require("nw.gui");
+		var Main = require(process.versions["node-webkit"].split(".")[1] >= 10 ? "./www/lib/Main": "./lib/Main");
+		Main.init();
+	</script>
 
 </body>
 </html>

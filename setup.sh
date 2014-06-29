@@ -156,6 +156,7 @@ for PLUGIN_DIR in cloud9_ext/plugins-server/*/; do
 	echo "  * $PLUGIN_NAME ..."
 	cp -a "$PLUGIN_DIR" "./cloud9/plugins-server/$PLUGIN_NAME"
 done
+echo
 
 
 # node-webkit
@@ -189,12 +190,20 @@ else
 
 	Darwin)
 		#TODO: unzip from piped stdin instead?
-		curl -O "http://dl.node-webkit.org/v$NW_VER/node-webkit-v$NW_VER-osx-ia32.zip"
-		unzip -n "node-webkit-v$NW_VER-osx-ia32.zip"
-		rm "node-webkit-v$NW_VER-osx-ia32.zip"
-		mv node-webkit.app C9.app
+		NW_NAME="node-webkit-v$NW_VER-osx-ia32"
+		curl -O "http://dl.node-webkit.org/v$NW_VER/$NW_NAME.zip"
+		unzip -n "$NW_NAME.zip"
+		rm "$NW_NAME.zip"
+		if [ -d "node-webkit.app" ]; then	# older packages
+			mv "node-webkit.app" "C9.app"
+		else	# newer packages
+			mv "$NW_NAME/node-webkit.app" "C9.app"
+			rm -fr "$NW_NAME"
+		fi
 		cp darwin/Info.plist C9.app/Contents/Info.plist
 		cp darwin/nw.icns C9.app/Contents/Resources/nw.icns
+		mkdir "$NW_DIR"
+		echo "The existence of this dir prevents 'setup.sh' from installing 'node-webkit' again;  See the C9.app instead" >> "$NW_DIR/README"
 		;;
 
 	*)
